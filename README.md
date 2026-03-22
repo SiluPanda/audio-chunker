@@ -3,6 +3,7 @@
 Split audio into transcription-ready segments using voice activity detection boundaries.
 
 [![npm version](https://img.shields.io/npm/v/audio-chunker.svg)](https://www.npmjs.com/package/audio-chunker)
+[![npm downloads](https://img.shields.io/npm/dt/audio-chunker.svg)](https://www.npmjs.com/package/audio-chunker)
 [![license](https://img.shields.io/npm/l/audio-chunker.svg)](https://github.com/SiluPanda/audio-chunker/blob/master/LICENSE)
 [![node](https://img.shields.io/node/v/audio-chunker.svg)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
