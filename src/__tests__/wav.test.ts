@@ -318,3 +318,33 @@ describe('detectFormat', () => {
     expect(detectFormat(Buffer.alloc(0))).toBe('unknown');
   });
 });
+
+describe('encodeWav multi-channel', () => {
+  it('should produce correct dataSize for stereo encoding', () => {
+    const samples = generateTone(100, 16000);
+    const wav = encodeWav(samples, 16000, 2, 16);
+    const info = parseWav(wav);
+    // Each mono sample is duplicated across 2 channels
+    expect(info.dataSize).toBe(samples.length * 2 * 2); // samples * channels * bytesPerSample
+    expect(info.channels).toBe(2);
+    expect(info.blockAlign).toBe(4);
+  });
+
+  it('should roundtrip stereo encode/decode back to mono', () => {
+    const samples = generateTone(50, 16000);
+    const wav = encodeWav(samples, 16000, 2, 16);
+    const info = parseWav(wav);
+    const decoded = extractPcmFloat32(wav, info);
+    // extractPcmFloat32 averages channels → mono, should match original
+    expect(decoded.length).toBe(samples.length);
+    for (let i = 0; i < decoded.length; i++) {
+      expect(decoded[i]).toBeCloseTo(samples[i], 2);
+    }
+  });
+
+  it('should throw for unsupported bit depth in encoding', () => {
+    const samples = generateTone(10, 16000);
+    expect(() => encodeWav(samples, 16000, 1, 24)).toThrow('Unsupported bit depth');
+    expect(() => encodeWav(samples, 16000, 1, 32)).toThrow('Unsupported bit depth');
+  });
+});

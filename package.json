@@ -1,6 +1,6 @@
 {
   "name": "audio-chunker",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Chunk audio streams into transcription-ready segments",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -209,10 +209,14 @@ export function encodeWav(
   channels: number = 1,
   bitDepth: number = 16,
 ): Buffer {
+  if (bitDepth !== 16 && bitDepth !== 8) {
+    throw new Error(`Unsupported bit depth for encoding: ${bitDepth}. Only 16-bit and 8-bit are supported.`);
+  }
+
   const bytesPerSample = bitDepth / 8;
   const blockAlign = channels * bytesPerSample;
   const byteRate = sampleRate * blockAlign;
-  const dataSize = samples.length * bytesPerSample;
+  const dataSize = samples.length * channels * bytesPerSample;
   const headerSize = 44;
   const fileSize = headerSize + dataSize;
 
@@ -237,16 +241,21 @@ export function encodeWav(
   buffer.write('data', 36, 4, 'ascii');
   buffer.writeUInt32LE(dataSize, 40);
 
-  // Write PCM data
+  // Write PCM data (duplicate mono samples across all channels)
+  let writeOffset = headerSize;
   for (let i = 0; i < samples.length; i++) {
     const clamped = Math.max(-1, Math.min(1, samples[i]));
 
-    if (bitDepth === 16) {
-      const intSample = Math.round(clamped * 32767);
-      buffer.writeInt16LE(intSample, headerSize + i * 2);
-    } else if (bitDepth === 8) {
-      const intSample = Math.round((clamped + 1) * 127.5);
-      buffer.writeUInt8(intSample, headerSize + i);
+    for (let ch = 0; ch < channels; ch++) {
+      if (bitDepth === 16) {
+        const intSample = Math.round(clamped * 32767);
+        buffer.writeInt16LE(intSample, writeOffset);
+        writeOffset += 2;
+      } else {
+        const intSample = Math.round((clamped + 1) * 127.5);
+        buffer.writeUInt8(intSample, writeOffset);
+        writeOffset += 1;
+      }
     }
   }
 
