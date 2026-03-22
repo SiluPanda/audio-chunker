@@ -72,8 +72,9 @@ export function classifyFrames(
 
   const frames: boolean[] = [];
 
-  for (let start = 0; start + frameSizeSamples <= samples.length; start += hopSizeSamples) {
-    const rms = computeRms(samples, start, frameSizeSamples);
+  for (let start = 0; start < samples.length; start += hopSizeSamples) {
+    const len = Math.min(frameSizeSamples, samples.length - start);
+    const rms = computeRms(samples, start, len);
     frames.push(rms > threshold);
   }
 

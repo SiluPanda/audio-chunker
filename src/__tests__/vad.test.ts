@@ -91,6 +91,21 @@ describe('classifyFrames', () => {
     expect(silenceFrames.filter((f) => !f).length).toBeGreaterThan(silenceFrames.length * 0.8);
   });
 
+  it('should include partial frames at end of audio', () => {
+    // Create audio where the last partial frame contains speech
+    // 500 samples at 16kHz = 31.25ms, frame=30ms, hop=15ms
+    // Without partial frame fix: only 1 frame (0-480). With fix: 2 frames.
+    const shortLoudAudio = generateTone(31.25, 16000, 440, 0.5);
+    const frames = classifyFrames(shortLoudAudio, 16000, {
+      frameSizeMs: 30,
+      hopSizeMs: 15,
+      energyThreshold: 0.01,
+    });
+    // Should have 3 frames: (0-480), (240-500 partial), (480-500 partial)
+    expect(frames.length).toBe(3);
+    expect(frames.every(f => f === true)).toBe(true);
+  });
+
   it('should respect custom frame and hop sizes', () => {
     const audio = generateTone(500, 16000, 440, 0.5);
     const frames20ms = classifyFrames(audio, 16000, { frameSizeMs: 20, hopSizeMs: 10 });

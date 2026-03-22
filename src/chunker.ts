@@ -283,7 +283,7 @@ function extractChunk(
   forceSplit: boolean,
 ): AudioChunk {
   const startSample = Math.max(0, Math.floor(startSec * sampleRate));
-  const endSample = Math.min(pcmSamples.length, Math.ceil(endSec * sampleRate));
+  const endSample = Math.min(pcmSamples.length, Math.floor(endSec * sampleRate));
 
   const chunkSamples = pcmSamples.slice(startSample, endSample);
   const data = encodeWav(chunkSamples, sampleRate, channels);
